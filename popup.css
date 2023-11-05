@@ -5,6 +5,10 @@
   --light-cream: #faf0e6;
 }
 
+.error {
+    color: red; 
+}
+
 #logo {
   width: 250px;
 }
