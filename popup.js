@@ -1,16 +1,18 @@
 const endpoint = 'http://localhost:5000';
 // Simulate a network request
 async function getAnalysis(url) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(response.articles);
-    }, 1000);
-  });
+  // return new Promise((resolve) => {
+  //   setTimeout(() => {
+  //     resolve(response.articles);
+  //   }, 1000);
+  // });
   // Use fetch to get a a response from the server with the url as the query parameter
-  // const encodedUrl = btoa(url)
-  // const response = await fetch(`${endpoint}?q=${encodedUrl}`)
-  // const resp = await response.json()
-  // return resp.articles
+  const encodedUrl = btoa(url)
+  const response = await fetch(`${endpoint}?q=${encodedUrl}`)
+  const resp = await response.json()
+  const currentArticle = resp.articles.find(article => article.url === url)
+  const otherArticles = resp.articles.filter(article => article.url !== url).sort((a, b) => a.bias - b.bias);
+  return { currentArticle, otherArticles }
 }
 
 document.getElementById('find-button').addEventListener('click', async () => {
@@ -23,10 +25,15 @@ document.getElementById('find-button').addEventListener('click', async () => {
   findButton.replaceWith(loader);
 
   try {
-    const articles = await getAnalysis(await getCurrentUrl());
+    const { currentArticle, otherArticles } = await getAnalysis(await getCurrentUrl());
 
-    for (let article of articles) {
-      const row = createTableRow(article);
+    tableContainer.appendChild(createElement('h2', 'My analysis of the article you are reading:'));
+    let row = createTableRow(currentArticle);
+    tableContainer.appendChild(row);
+
+    tableContainer.appendChild(createElement('h2', 'I found these other articles on a similar topic:'));
+    for (let article of otherArticles) {
+      row = createTableRow(article);
       tableContainer.appendChild(row);
     }
   } catch (error) {
@@ -68,7 +75,7 @@ function createLoader() {
   return loader;
 }
 
-function createTableCell(tag, innerHTML) {
+function createElement(tag, innerHTML) {
   const element = document.createElement(tag);
   element.innerHTML = innerHTML;
   return element;
@@ -77,7 +84,7 @@ function createTableCell(tag, innerHTML) {
 function createKeyPointsList(keyPoints) {
   const keyPointsList = document.createElement('ul');
   for (let keyPoint of keyPoints) {
-    const keyPointElement = createTableCell('li', keyPoint);
+    const keyPointElement = createElement('li', keyPoint);
     keyPointsList.appendChild(keyPointElement);
   }
   return keyPointsList;
@@ -86,63 +93,79 @@ function createKeyPointsList(keyPoints) {
 function createTableRow(article) {
   const row = document.createElement('div');
 
-  const title = createTableCell('div', article.title);
+  const title = createElement('a', article.title);
+  title.href = article.url;
   title.classList.add('article-title');
+  row.appendChild(title);
 
   const tagsContainer = document.createElement('div');
   tagsContainer.classList.add('tags-container');
 
-  const domain = createTableCell('div', `<b>${(new URL(article.url).hostname).replace('www.', '')}</b>`);
-  const bias = createTableCell('div', `Bias: ${article.bias}`);
-  const topic = createTableCell('div', article.topic);
+  const domain = createElement('div', `<b>${(new URL(article.url).hostname).replace('www.', '')}</b>`);
+  const bias = createBiasTag(article.bias);
   tagsContainer.appendChild(domain);
   tagsContainer.appendChild(bias);
-  tagsContainer.appendChild(topic);
+  row.appendChild(tagsContainer);
 
-  const keyPoints = createTableCell('div', '');
+  const topic = createElement('div', `<b>Detected Topic:</b> ${article.topic}`);
+  row.appendChild(topic);
+
+  const keyPoints = createElement('div', '');
   keyPoints.appendChild(createKeyPointsList(article.key_points));
 
-  row.appendChild(title);
-  row.appendChild(tagsContainer);
   row.appendChild(keyPoints);
 
   return row;
 }
 
+function createBiasTag(bias) {
+  const biasTag = document.createElement('div');
+  biasTag.classList.add('bias-tag');
+  biasTag.style.backgroundColor = getBiasColor(bias);
+  biasTag.innerHTML = bias;
+  return biasTag;
+}
+
+function getBiasColor(biasScore) {
+  const red = Math.round(biasScore * 25.5);
+  const green = Math.round((10 - biasScore) * 25.5);
+  return `rgb(${red}, ${green}, 0)`;
+}
+
 const response = {
-  articles: [
+  "currentArticle": {
+    "bias": 8,
+    "key_points": [
+      "The testimony from the Covid inquiry shows Boris Johnson was completely unfit to be Prime Minister during the pandemic. He was indecisive, unethical and negligent.",
+      "Those around Johnson, like his cabinet secretary and scientific advisors, recognized how incompetent he was but failed to restrain him.",
+      "The systems meant to check a bad leader, like the cabinet and civil service, utterly failed to do so. This allowed Johnson's incompetence to result in needless harm."
+    ],
+    "title": "When Britain most needed a decent leader, we had a derelict at the helm",
+    "topic": " \nTestimony from the Covid inquiry provides damning evidence of Boris Johnson's unfitness to be prime minister during the pandemic.\n",
+    "url": "https://www.theguardian.com/commentisfree/2023/nov/04/when-britain-needed-a-decent-leader-we-had-a-derelict-at-the-helm-boris-johnson"
+  },
+  "otherArticles": [
     {
       "bias": 5,
       "key_points": [
-        "The Hamas",
-        "run health ministry in Gaza says over 30 people were killed in an Israeli strike on a refugee camp. Hamas says most victims were women and children.",
-        "There is growing pressure for a ceasefire as the conflict enters its 5th week. The US is pushing for a \"humanitarian pause\" though differences remain with Arab allies on the need for an immediate ceasefire.",
-        "Protests against Israeli actions took place in London and Washington DC over the weekend, with thousands participating.",
-        "Clashes between Israeli forces and Palestinians continued across the occupied West Bank.",
-        "Israel's ground offensive in Gaza is meeting stiffer resistance than expected, with ambushes and attacks inflicting casualties. Questions remain over whether war aims can be achieved.",
-        "Biden suggested some progress in US efforts to get Israel to agree to a pause in strikes, but gave no specifics. His comment came after the US Secretary of State met Arab counterparts."
+        "Boris Johnson agreed with some Tory MPs who thought Covid was \"nature's way of dealing with old people\", according to diary entries by former chief scientific adviser Sir Patrick Vallance.",
+        "Ex-adviser Dominic Cummings told the inquiry the government had no plan for the pandemic and was in \"complete chaos\".",
+        "The inquiry was shown offensive messages sent by Mr Cummings about cabinet ministers and top officials during the pandemic."
       ],
-      "title": "Biden says progress being made towards a ‘pause’ in fighting – as it happened",
-      "topic": "  Progress towards a ceasefire in the Israel-Hamas conflict",
-      "url": "https://www.theguardian.com/world/live/2023/nov/04/israel-hamas-war-live-blinken-set-to-meet-with-middle-east-foreign-ministers-in-jordan-airstrike-on-gaza-ambulance-kills-15#top-of-blog"
+      "title": "Boris Johnson thought old people should accept Covid fate, inquiry told",
+      "topic": " \nTestimony from the Covid inquiry provides damning evidence of Boris Johnson's unfitness to be prime minister during the pandemic.\n",
+      "url": "https://www.bbc.com/news/uk-politics-67278517"
     },
     {
-      "bias": 3,
+      "bias": 8,
       "key_points": [
-        "A ceasefire has been reached between Israel and Hamas in Gaza, ending 11 days of fighting.",
-        "At least 243 people were killed in Gaza and 12 in Israel during the clashes.",
-        "Hamas claims Israel agreed to lift restrictions on al",
-        "Aqsa mosque in Jerusalem and the Sheikh Jarrah neighborhood. Israel denies this.",
-        "The ceasefire went into effect at 2am local time on Friday.",
-        "The ceasefire terms are not public, but were negotiated with help from Egypt, Qatar, the US and UN.",
-        "It's unclear how long the ceasefire will last. There are still underlying issues between Israel and Palestinians that remain unresolved.",
-        "Previous ceasefires between Israel and Hamas have eventually broken down and fighting has resumed.",
-        "World leaders have welcomed the ceasefire and hope it leads to a permanent end to hostilities. But long",
-        "term peace likely requires addressing core disputes."
+        "Boris Johnson told advisers that Covid was \"nature's way of dealing with old people\" and he didn't believe the NHS was overwhelmed.",
+        "Patrick Vallance's diary said Johnson was \"obsessed with older people accepting their fate\" during the pandemic.",
+        "Vallance also wrote that the chief whip said \"we should let the old people get it and protect others\", which Johnson agreed with."
       ],
-      "title": "Israel-Gaza: The ceasefire deal between Israel and Hamas",
-      "topic": "  Progress towards a ceasefire in the Israel-Hamas conflict",
-      "url": "https://www.bbc.com/news/57200843"
+      "title": " Boris Johnson favoured ‘older people accepting their fate’, Covid inquiry hears",
+      "topic": " \nTestimony from the Covid inquiry provides damning evidence of Boris Johnson's unfitness to be prime minister during the pandemic.\n",
+      "url": "https://www.theguardian.com/uk-news/2023/oct/31/boris-johnson-favoured-older-people-accepting-their-fate-covid-inquiry-hears"
     }
   ]
 } 
