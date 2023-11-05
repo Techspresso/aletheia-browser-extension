@@ -1,0 +1,78 @@
+:root {
+  --dark-purple: #352f44;
+  --dark-blue: #1e2a4a;
+  --light-cream: #faf0e6;
+  --lavander: #b9b4c7;
+}
+
+#logo {
+  width: 250px;
+}
+
+body {
+  background: linear-gradient(to bottom, var(--dark-blue), var(--dark-purple));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  width: 800px;
+  height: 500px;
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--light-cream);
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+#find-button {
+  background-color: var(--lavander);
+  color: var(--dark-purple);
+  margin-top: 1rem;
+  padding: 0.75rem 2.5rem;
+  border-radius: 10px;
+}
+
+h1 {
+  font-family: "Comfortaa", cursive;
+  margin-bottom: 0px;
+  font-weight: 100;
+}
+
+p {
+  margin-bottom: 0px;
+}
+
+/* If you only want to apply to the table */
+body {
+  font-family: "Open Sans", cursive;
+}
+
+#table-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#table-container table {
+  border-collapse: collapse;
+  width: 90%;
+  text-align: left;
+}
+
+#table-container th,
+#table-container td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+#table-container th {
+  background-color: #4a4a4a;
+  color: white;
+}
+
+#table-container tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#table-container tr:hover {
+  background-color: #ddd;
+}
