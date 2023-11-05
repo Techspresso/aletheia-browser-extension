@@ -1,8 +1,8 @@
 :root {
   --dark-purple: #352f44;
   --dark-blue: #1e2a4a;
-  --light-cream: #faf0e6;
   --lavander: #b9b4c7;
+  --light-cream: #faf0e6;
 }
 
 #logo {
@@ -13,13 +13,19 @@ body {
   background: linear-gradient(to bottom, var(--dark-blue), var(--dark-purple));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  width: 800px;
-  height: 500px;
-  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 700px;
+  height: 560px;
+  font: 14px "Open Sans", Helvetica, Arial, sans-serif;
   color: var(--light-cream);
+}
+
+main {
   flex-direction: column;
   display: flex;
   align-items: center;
+  padding: 2rem;
+  overflow-y: auto;
+  height: 500px;
 }
 
 #find-button {
@@ -40,39 +46,47 @@ p {
   margin-bottom: 0px;
 }
 
-/* If you only want to apply to the table */
-body {
-  font-family: "Open Sans", cursive;
-}
-
 #table-container {
   width: 100%;
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  border-radius: 8px;
+  flex-direction: column;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
 }
 
 #table-container table {
   border-collapse: collapse;
-  width: 90%;
+  width: 100%;
   text-align: left;
 }
 
 #table-container th,
 #table-container td {
   padding: 10px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--light-cream);
 }
 
 #table-container th {
-  background-color: #4a4a4a;
-  color: white;
+  color: var(--light-cream);
+  font-weight: 600;
 }
 
-#table-container tr:nth-child(even) {
-  background-color: #f2f2f2;
+.article-title {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
 }
 
-#table-container tr:hover {
-  background-color: #ddd;
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  margin-top: 0.8rem;
+  margin-bottom: 2rem;
 }
